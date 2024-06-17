@@ -3,8 +3,10 @@ import numpy as np
 import yfinance as yf
 
 def get_user_input():
-    country = input("Enter the country you want to invest in: ")
-    commodity = input("Enter the commodity you want to invest in: ")
+    print("USA or Canada")
+    country = input("from the following, Enter the country you want to invest in: ")
+    print("Gold, Silver or Oil")
+    commodity = input("from the following, Enter the commodity you want to invest in: ")
     return country, commodity
 
 def get_stock_data(country, commodity):
