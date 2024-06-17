@@ -1,0 +1,86 @@
+import pandas as pd
+import numpy as np
+import yfinance as yf
+
+def get_user_input():
+    country = input("Enter the country you want to invest in: ")
+    commodity = input("Enter the commodity you want to invest in: ")
+    return country, commodity
+
+def get_stock_data(country, commodity):
+    # Retrieve stock data based on the country and commodity
+    if country == "USA":
+        if commodity == "Gold":
+            ticker = "GLD"
+        elif commodity == "Oil":
+            ticker = "USO"
+        elif commodity == "Silver":
+            ticker = "SLV"
+        else:
+            print("Sorry, we don't have data for that commodity in the USA.")
+            return None, None
+    elif country == "Canada":
+        if commodity == "Gold":
+            ticker = "CGLD.TO"
+        elif commodity == "Oil":
+            ticker = "CLR.TO"
+        elif commodity == "Silver":
+            ticker = "SLV.TO"
+        else:
+            print("Sorry, we don't have data for that commodity in Canada.")
+            return None, None
+    else:
+        print("Sorry, we don't have data for that country.")
+        return None, None
+
+    # Fetch the stock data using yfinance
+    stock_data = yf.download(ticker, period="1y")
+    return stock_data, ticker
+
+def calculate_portfolio_value(stock_data, investment_amount):
+    portfolio_value = stock_data["Adj Close"] * investment_amount
+    return portfolio_value
+
+def calculate_portfolio_returns(portfolio_value):
+    portfolio_returns = portfolio_value.pct_change()
+    return portfolio_returns
+
+def calculate_annual_return(portfolio_returns):
+    annual_return = (1 + portfolio_returns.mean()) ** 252 - 1
+    return annual_return
+
+def calculate_annual_volatility(portfolio_returns):
+    annual_volatility = portfolio_returns.std() * np.sqrt(252)
+    return annual_volatility
+
+def calculate_sharpe_ratio(annual_return, annual_volatility):
+    sharpe_ratio = annual_return / annual_volatility
+    return sharpe_ratio
+
+def calculate_max_drawdown(portfolio_value):
+    max_drawdown = (portfolio_value / portfolio_value.cummax() - 1).min()
+    return max_drawdown
+
+def print_performance_metrics(annual_return, annual_volatility, sharpe_ratio, max_drawdown):
+    print(f"Annual Return: {annual_return:.2%}")
+    print(f"Annual Volatility: {annual_volatility:.2%}")
+    print(f"Sharpe Ratio: {sharpe_ratio:.2f}")
+    print(f"Maximum Drawdown: {max_drawdown:.2%}")
+
+def main():
+    country, commodity = get_user_input()
+    stock_data, ticker = get_stock_data(country, commodity)
+
+    if stock_data is not None and ticker is not None:
+        investment_amount = float(input(f"Enter the investment amount in {ticker}: "))
+        portfolio_value = calculate_portfolio_value(stock_data, investment_amount)
+        portfolio_returns = calculate_portfolio_returns(portfolio_value)
+        annual_return = calculate_annual_return(portfolio_returns)
+        annual_volatility = calculate_annual_volatility(portfolio_returns)
+        sharpe_ratio = calculate_sharpe_ratio(annual_return, annual_volatility)
+        max_drawdown = calculate_max_drawdown(portfolio_value)
+
+        print_performance_metrics(annual_return, annual_volatility, sharpe_ratio, max_drawdown)
+
+if __name__ == "__main__":
+    main()
